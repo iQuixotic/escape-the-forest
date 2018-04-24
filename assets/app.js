@@ -8,8 +8,10 @@ function characterCreator(name, type, attack, defense) {
     this.defense=defense;
     this.hitTheTarget = function(){
         enemyArr[0].hp -= attack;
+        enemyArr[0].defense -= attack;
         console.log('');
-        return enemyArr[0].hp;
+       return enemyArr[0].hp;
+       return enemyArr[0].defense;
     }
 }
 // r is for recursive counter
@@ -90,7 +92,8 @@ let selectParty = function () {
     });   
 }
 
-let coinToss = (Math.floor(Math.random() * 2) );
+
+
 let critChance = (Math.floor(Math.random() * 100) + 1);
 
 function enemyConstruct(name, attack, defense) {
@@ -98,9 +101,10 @@ function enemyConstruct(name, attack, defense) {
     this.attack=attack;
     this.defense=defense;
     this.hitTheTarget = function(){
-        party[coinToss].hp -= attack;
+        let coinflip = (Math.floor(Math.random() * 2) );
+        party[coinflip].defense -= attack;
         console.log('');
-        return party[coinToss].hp;
+        return party[coinflip].defense;
     }
 }
 let enemyArr = [];
@@ -118,17 +122,7 @@ function playGame() {
     console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
     escapedOrNot();
 
-    let wolfSpawnChance = (Math.floor(Math.random() * 100) + 1);
-    console.log(wolfSpawnChance);
-    if(tile>1 && tile<35 && wolfSpawnChance>9){
-        console.log('A wolf appeared.');
-        wolfExists = true;
-    } if (wolfExists){
-        let wolf = new enemyConstruct('wolf', 20, 200);
-        enemyArr.push(wolf);
-        fight();
-    }
-    
+   
     if (r < 5000 && wolfExists === false) {
         
         inquirer.prompt(
@@ -169,6 +163,24 @@ function playGame() {
                     default:
                         def();
                 }
+    // all the logic for a random wolf battle
+    let wolfSpawnChance = (Math.floor(Math.random() * 100) + 1);
+    console.log(wolfSpawnChance);
+    if(tile>1 && tile<35 && wolfSpawnChance>9){
+        console.log('A wolf appeared.');
+        wolfExists = true;
+    } if (wolfExists){
+        let wolf = new enemyConstruct('wolf', 20, 200);
+        enemyArr.push(wolf);
+        console.log(enemyArr[0].name + ' this is the enemy array object');
+        fight();
+    // console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
+    // console.log('   -    ' +'HP: ' + party[0].defense + '    -    ' + 'Attk: ' + party[0].attack + '     -     ' + party[0].name);
+    // console.log('   -    ' +'HP: ' + party[1].defense + '    -    ' + 'Attk: ' + party[1].attack + '     -     ' + party[1].name);
+    // console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
+    }
+
+
                 if( player.todo !=='Check Inventory'){
                 r++;
                 console.log('Score: ' + r + '        (Lower is better)');
@@ -178,8 +190,22 @@ function playGame() {
     }
 }
 
+// Checks to see if all party members health equals zero
+function gameOver(){
+    if(party[0].defense <= 0 && party[1].defense <= 0){
+        console.log('----------------------------------');
+        console.log('');
+        console.log('          Love is Over');
+        console.log('');
+        console.log('----------------------------------');
+        r=5000;
+        return 0;
+    }
+}
+
 function fight() {
-    if (enemyArr[0].defense > 0){
+    gameOver();
+    if (r<5000 && enemyArr[0].defense > 0 && enemyArr[0].name !== undefined){
     inquirer.prompt([{
         type: "list",
         name: "whatDo",
@@ -188,33 +214,43 @@ function fight() {
       }, {
         type: "list",
         name: "whatDoNext",
-        message: '',
-        choices: ['Attack', 'Inventory']
-      }, {
+        message: 'FIGHT !!!',
+        choices: ['Attack', 'Inventory'] 
        
       }]).then(function(answers) {
-          if(answers.whatDo === 'Run'){
+        // if(answers.whatDo === 'Fight'){
+        //     console.log(enemyArr);
+        // }
+          if(answers.whatDo !== 'Fight'){
               console.log(enemyArr);
               enemyArr.pop();
               fight();
           }
           if(answers.whatDoNext === 'Attack') {
-        
-            console.log(enemyArr[0].defense);
+            console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
+            console.log('   -    ' +'HP: ' + party[0].defense + '    -    ' + 'Attk: ' + party[0].attack + '     -     ' + party[0].name);
+            console.log('   -    ' +'HP: ' + party[1].defense + '    -    ' + 'Attk: ' + party[1].attack + '     -     ' + party[1].name);
+            console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
+            console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
+            console.log('   -    ' +'HP: ' + enemyArr[0].defense + '    -    ' + 'Attk: ' + enemyArr[0].attack + '     -     ' + enemyArr[0].name);
+            console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
+          
             party[0].hitTheTarget();
             party[1].hitTheTarget();
-            console.log(enemyArr[0].defense);
             enemyArr[0].hitTheTarget();
+
             fight();
           }
-       
       });
     } 
-    if(enemyArr[0].defense <= 0 || undefined){} {
+    if(enemyArr[0].defense <= 0 || enemyArr[0].name === null) {
         console.log('The enemy was defeated !!')
+        enemyArr.pop();
         wolfExists = false;
+        playGame();
     }
 }
+
 
 
 function escapedOrNot(){
