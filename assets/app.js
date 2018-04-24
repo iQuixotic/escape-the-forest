@@ -94,7 +94,7 @@ let selectParty = function () {
 
 
 
-let critChance = (Math.floor(Math.random() * 100) + 1);
+let critChance, coinflip;
 
 function enemyConstruct(name, attack, defense) {
     this.name=name;
@@ -110,18 +110,8 @@ function enemyConstruct(name, attack, defense) {
 let enemyArr = [];
 let wolfExists = false;
 
-
-
-let enemyAttack, enemyHp;
-
-
 function playGame() {
-    console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
-    console.log('   -    ' +'HP: ' + party[0].defense + '    -    ' + 'Attk: ' + party[0].attack + '     -     ' + party[0].name);
-    console.log('   -    ' +'HP: ' + party[1].defense + '    -    ' + 'Attk: ' + party[1].attack + '     -     ' + party[1].name);
-    console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
-    escapedOrNot();
-
+        printStatus();
    
     if (r < 5000 && wolfExists === false) {
         
@@ -163,30 +153,115 @@ function playGame() {
                     default:
                         def();
                 }
-    // all the logic for a random wolf battle
-    let wolfSpawnChance = (Math.floor(Math.random() * 100) + 1);
-    console.log(wolfSpawnChance);
+                console.log('this is r' + r);
+                checkForWolves();
+
+                if( player.todo !=='Check Inventory' && wolfExists === false){
+                r++;
+                console.log('Score: ' + r + '        (Lower is better)');
+                playGame();
+                }
+            });
+    }
+}
+
+// a recursive function for battles
+function fight() {
+    gameOver();
+    // if(){
+
+    // }
+    if (r<5000 && enemyArr[0].defense > 0 && enemyArr[0].name !== undefined){
+         firstFightQuestion();
+        //  secondFightQuestion();
+    } 
+    if(enemyArr[0].defense <= 0) {
+        console.log('The enemy was defeated !!')
+        enemyArr.pop();
+        wolfExists = false;
+        playGame();
+    }
+}
+
+// function for first fight question
+function firstFightQuestion(){
+    inquirer.prompt({
+        type: "list",
+        name: "whatDo",
+        message: enemyArr[0].name + ' is ready to attack. What will you do ?',
+        choices: ['Fight', 'Run']
+      }).then(function(answers) {
+        
+          if(answers.whatDo !== 'Fight'){
+              enemyArr.pop();
+              wolfExists=false;
+              playGame();
+          } else{
+              secondFightQuestion();
+          }
+        });
+}
+
+// function for second fight question
+function secondFightQuestion(){
+    inquirer.prompt({
+        type: "list",
+        name: "whatDoNext",
+        message: 'FIGHT !!!\n',
+        choices: ['Attack', 'Inventory'] 
+  }).then(function(answers) {
+    if(answers.whatDoNext === 'Attack') {
+        printFight();
+      
+        party[0].hitTheTarget();
+        party[1].hitTheTarget();
+        enemyArr[0].hitTheTarget();
+
+        fight();
+      }
+  
+});
+}
+
+ // all the logic for a random wolf battle
+function checkForWolves(){
+   
+    let wolfSpawnChance = (Math.floor(Math.random() * 10) + 1);
+    console.log('');
     if(tile>1 && tile<35 && wolfSpawnChance>9){
-        console.log('A wolf appeared.');
+        console.log('A wild wolf appeared !!' );
+        console.log('');
         wolfExists = true;
     } if (wolfExists){
         let wolf = new enemyConstruct('wolf', 20, 200);
         enemyArr.push(wolf);
-        console.log(enemyArr[0].name + ' this is the enemy array object');
         fight();
     // console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
     // console.log('   -    ' +'HP: ' + party[0].defense + '    -    ' + 'Attk: ' + party[0].attack + '     -     ' + party[0].name);
     // console.log('   -    ' +'HP: ' + party[1].defense + '    -    ' + 'Attk: ' + party[1].attack + '     -     ' + party[1].name);
     // console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
     }
+}
+// function for checking inventory and using an item
+function checkI() {
+    inquirer.prompt({
+        type: "rawlist",
+        name: "inventory",
+        message: "What would you like to use?",
+        choices: ["Map", "Rusty Axe", "Revolver", "salt", "dirty socks", "Magic Wand"]
+    }).then(function (player) {
+        if (player.inventory === "Map") {
+            showTheMap();
+            playGame();
+        }
+    });
+}
 
-
-                if( player.todo !=='Check Inventory'){
-                r++;
-                console.log('Score: ' + r + '        (Lower is better)');
-                playGame();
-                }
-            });
+//check for a win state
+function escapedOrNot(){
+    if (tile === 36){
+        r=5000;
+        console.log('Whew, you made it out in '+ r + ' turns !!!');
     }
 }
 
@@ -203,78 +278,30 @@ function gameOver(){
     }
 }
 
-function fight() {
-    gameOver();
-    if (r<5000 && enemyArr[0].defense > 0 && enemyArr[0].name !== undefined){
-    inquirer.prompt([{
-        type: "list",
-        name: "whatDo",
-        message: enemyArr[0].name + ' is ready to attack. What will you do ?',
-        choices: ['Fight', 'Run']
-      }, {
-        type: "list",
-        name: "whatDoNext",
-        message: 'FIGHT !!!',
-        choices: ['Attack', 'Inventory'] 
-       
-      }]).then(function(answers) {
-        // if(answers.whatDo === 'Fight'){
-        //     console.log(enemyArr);
-        // }
-          if(answers.whatDo !== 'Fight'){
-              console.log(enemyArr);
-              enemyArr.pop();
-              fight();
-          }
-          if(answers.whatDoNext === 'Attack') {
-            console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
-            console.log('   -    ' +'HP: ' + party[0].defense + '    -    ' + 'Attk: ' + party[0].attack + '     -     ' + party[0].name);
-            console.log('   -    ' +'HP: ' + party[1].defense + '    -    ' + 'Attk: ' + party[1].attack + '     -     ' + party[1].name);
-            console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
-            console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
-            console.log('   -    ' +'HP: ' + enemyArr[0].defense + '    -    ' + 'Attk: ' + enemyArr[0].attack + '     -     ' + enemyArr[0].name);
-            console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
-          
-            party[0].hitTheTarget();
-            party[1].hitTheTarget();
-            enemyArr[0].hitTheTarget();
-
-            fight();
-          }
-      });
-    } 
-    if(enemyArr[0].defense <= 0 || enemyArr[0].name === null) {
-        console.log('The enemy was defeated !!')
-        enemyArr.pop();
-        wolfExists = false;
-        playGame();
-    }
+//-------------------------------------------- FUNCTIONS FOR PRINTING ------------------------------------------------------------------------
+//function for displaying current Attributes
+function printStatus() {
+    console.log('');
+    console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
+    console.log('   -    ' +'HP: ' + party[0].defense + '    -    ' + 'Attk: ' + party[0].attack + '     -     ' + party[0].name);
+    console.log('   -    ' +'HP: ' + party[1].defense + '    -    ' + 'Attk: ' + party[1].attack + '     -     ' + party[1].name);
+    console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
+    console.log('');
+    console.log('');
+    console.log('');
+    escapedOrNot();
 }
 
-
-
-function escapedOrNot(){
-    if (tile === 36){
-        r=5000;
-        console.log('Whew, you made it out in '+ r + ' turns !!!');
-    }
+// status to show enemy's and player's current status 
+function printFight() {
+    console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
+        console.log('   -    ' +'HP: ' + party[0].defense + '    -    ' + 'Attk: ' + party[0].attack + '     -     ' + party[0].name);
+        console.log('   -    ' +'HP: ' + party[1].defense + '    -    ' + 'Attk: ' + party[1].attack + '     -     ' + party[1].name);
+        console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
+        console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
+        console.log('   -    ' +'HP: ' + enemyArr[0].defense + '    -    ' + 'Attk: ' + enemyArr[0].attack + '     -     ' + enemyArr[0].name);
+        console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
 }
-
-// function for checking inventory and using an item
-function checkI() {
-    inquirer.prompt({
-        type: "rawlist",
-        name: "inventory",
-        message: "What would you like to use?",
-        choices: ["Map", "Rusty Axe", "Revolver", "salt", "dirty socks", "Magic Wand"]
-    }).then(function (player) {
-        if (player.inventory === "Map") {
-            showTheMap();
-            playGame();
-        }
-    });
-}
-
 // // should show the map and display the current tile location
 function showTheMap() {
     console.log("==============================================================================");
@@ -302,5 +329,43 @@ function showTheMap() {
     console.log('You are currently on tile number ' + tile);
     console.log('');
     }
+function drawWolf(){
+console.log("      /\\      _-'/ ");
+console.log("    _/| \\-''- _ / ");
+console.log("__-'{ |         \\ ");
+console.log("   /             \\  ");
+console.log('   /      "o.  |o  }');
+console.log("   |           \\  ;");
+console.log("                  ',");
+console.log("     \\_        __ \\ ");
+console.log("        ''-_   \\.// ");
+console.log("          / '-____' ");
+console.log("         /");
+console.log("       _'");
+console.log("     _-'");
+}
+
+function drawForest() {
+    console.log('');
+console.log('                                                    ,@@@@@@@,');
+console.log('                                                     ,,,.   ,@@@@@@/@@,  .oo8888o.');
+console.log('                                                  ,&%%&%&&%,@@@@@/@@@@@@,8888\\88/8o');
+console.log("                                                 ,%&\\%&&%&&%,@@@\\@@@/@@@88\\88888/88'");
+console.log("                                                 %&&%&%&/%&&%@@\\@@/ /@@@88888\\88888'");
+console.log("                                                 %&&%/ %&%%&&@@\\ V /@@' `88\\8 `/88' ");
+console.log("                                                 `&%\\ ` /%&'    |.|        \\ '|8'");
+console.log('                                                     |o|        | |         | | ');
+console.log('                                                     |.|        | |         | | ');
+console.log('                                                     \\/ ._\//_/__/  ,\_//__\\/.  \_//__/_ ');
+console.log('');
+}
+
+// drawForest();
+// drawWolf();
+
+
+let allTheRandomness = {
+    critChance: (Math.floor(Math.random() * 100) + 1)
+};
 
 selectParty();
