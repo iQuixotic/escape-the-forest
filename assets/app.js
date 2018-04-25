@@ -1,5 +1,7 @@
 var inquirer = require("inquirer");
 
+const chalk = require('chalk');
+
  
 function characterCreator(name, type, attack, defense) {
     this.name=name;
@@ -125,35 +127,41 @@ function playGame() {
                 switch (player.todo) {
                     case 'Go Right':
                         console.log('you went right');
-                        tile += 1;
-                        
+                        goRight();
+                        console.log(facing)
+                        console.log(tile);
+
                         break;
                     case 'Go Left':
                         console.log('you went left');
-                        tile -= 1;
+                        goLeft();
+                        console.log(facing)
+                        console.log(tile);
                        
                         break;
                     case 'Go Up':
                         console.log('you went up');
-                        tile += 7;
+                        goForward();
+                        console.log(facing)
+                        console.log(tile);
+
                         
                         break;
                     case 'Go Down':
                         console.log('you went down');
-                        tile -= 7;
+                        goBack();
+                        console.log(facing)
+                        console.log(tile);
+
                         break;
                     case 'Check Inventory':
                         console.log('');
                         checkI();
                         break;
-                    // case 'Map':
-                    //     console.log('you showed the map');
-                    //     showTheMap();
-                    //     break;
                     default:
                         def();
                 }
-                console.log('this is r' + r);
+                console.log('this is tile#' + tile);
                 checkForWolves();
 
                 if( player.todo !=='Check Inventory' && wolfExists === false){
@@ -167,13 +175,10 @@ function playGame() {
 
 // a recursive function for battles
 function fight() {
-    gameOver();
-    // if(){
 
-    // }
+    gameOver();
     if (r<5000 && enemyArr[0].defense > 0 && enemyArr[0].name !== undefined){
          firstFightQuestion();
-        //  secondFightQuestion();
     } 
     if(enemyArr[0].defense <= 0) {
         console.log('The enemy was defeated !!')
@@ -203,24 +208,24 @@ function firstFightQuestion(){
 }
 
 // function for second fight question
-function secondFightQuestion(){
+function secondFightQuestion() {
     inquirer.prompt({
         type: "list",
         name: "whatDoNext",
         message: 'FIGHT !!!\n',
-        choices: ['Attack', 'Inventory'] 
-  }).then(function(answers) {
-    if(answers.whatDoNext === 'Attack') {
-        printFight();
-      
-        party[0].hitTheTarget();
-        party[1].hitTheTarget();
-        enemyArr[0].hitTheTarget();
+        choices: ['Attack', 'Inventory']
+    }).then(function (answers) {
+        if (answers.whatDoNext === 'Attack') {
+            printFight();
 
-        fight();
-      }
-  
-});
+            party[0].hitTheTarget();
+            party[1].hitTheTarget();
+            enemyArr[0].hitTheTarget();
+            fight();
+        } else if (answers.whatDoNext === 'Inventory') {
+            inventoryCheck();
+        }
+    });
 }
 
  // all the logic for a random wolf battle
@@ -236,12 +241,9 @@ function checkForWolves(){
         let wolf = new enemyConstruct('wolf', 20, 200);
         enemyArr.push(wolf);
         fight();
-    // console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
-    // console.log('   -    ' +'HP: ' + party[0].defense + '    -    ' + 'Attk: ' + party[0].attack + '     -     ' + party[0].name);
-    // console.log('   -    ' +'HP: ' + party[1].defense + '    -    ' + 'Attk: ' + party[1].attack + '     -     ' + party[1].name);
-    // console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
     }
 }
+
 // function for checking inventory and using an item
 function checkI() {
     inquirer.prompt({
@@ -302,7 +304,74 @@ function printFight() {
         console.log('   -    ' +'HP: ' + enemyArr[0].defense + '    -    ' + 'Attk: ' + enemyArr[0].attack + '     -     ' + enemyArr[0].name);
         console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
 }
-// // should show the map and display the current tile location
+
+let facing = 'north';
+
+// function goForward will not have to change directions
+function goForward() {
+    if (facing === 'north') {
+        tile += 7;
+    } else if (facing === 'south') {
+        tile -= 7;
+    } else if (facing === 'west'){
+        tile -= 1;
+    } else if (facing === 'east'){
+        tile +=1
+    }
+}
+
+// function goBack will have to go the opposite direction
+function goBack() {
+    if (facing === 'north') {
+        tile -= 7;
+        facing = 'south';
+    } else if (facing === 'south') {
+        tile += 7;
+        facing = 'north';
+    } else if (facing === 'west'){
+        tile += 1;
+        facing = 'east';
+    } else if (facing === 'east'){
+        tile -=1
+        facing = 'west';
+    }
+}
+
+// function goBack will have to go the opposite direction
+function goLeft() {
+    if (facing === 'north') {
+        tile -= 1;
+        facing = 'west';
+    } else if (facing === 'south') {
+        tile += 1;
+        facing = 'east';
+    } else if (facing === 'west'){
+        tile -= 7;
+        facing = 'south';
+    } else if (facing === 'east'){
+        tile +=7
+        facing = 'north';
+    }
+}
+
+// function goRight will have to change the compass direction
+function goRight() {
+    if (facing === 'north') {
+        tile += 1;
+        facing = 'east';
+    } else if (facing === 'south') {
+        tile -= 1;
+        facing = 'west';
+    } else if (facing === 'west'){
+        tile += 7;
+        facing = 'north';
+    } else if (facing === 'east'){
+        tile -=7
+        facing = 'south';
+    }
+}
+
+// should show the map and display the current tile location
 function showTheMap() {
     console.log("==============================================================================");
     console.log("|          |          |          |          |          |          |          |");
@@ -329,6 +398,7 @@ function showTheMap() {
     console.log('You are currently on tile number ' + tile);
     console.log('');
     }
+
 function drawWolf(){
 console.log("      /\\      _-'/ ");
 console.log("    _/| \\-''- _ / ");
@@ -360,12 +430,72 @@ console.log('                                                     \\/ ._\//_/__/
 console.log('');
 }
 
-// drawForest();
-// drawWolf();
 
 
 let allTheRandomness = {
     critChance: (Math.floor(Math.random() * 100) + 1)
 };
 
+
+
+//--------------------------------------------------------- Items and Uses Section -------------------------------------------------------------------
+function inventoryCheck() {
+    inquirer.prompt({
+        type: "rawlist",
+        name: "inventory",
+        message: "What would you like to use?",
+        choices: ["Map", "Rusty Axe", "revolver", "band-aid", "dirty socks", "Magic Wand", "AED", "fireworks", "mirror"]
+    }).then(function (player) {
+        switch (player.inventory) {
+            case 'Map':
+                console.log('heres the map');
+                fight();
+                break;
+            case 'Rusty Axe':
+                console.log('you have the rusty axe');
+                fight();
+                break;
+            case 'revolver':
+                console.log('can be used once for each bullet possessed');
+                fight();
+                break;
+            case 'band-aid':
+                console.log('can heal a small amount of hp per');
+                fight();
+
+                break;
+            case 'Magic Wand':
+                console.log('doubles mana for 1 battle. 12 tile movement cool-down');
+                fight();
+
+                break;
+            case 'AED':
+                console.log('the enemy is shocked that you have this. 1/4 chance of paral.');
+                fight();
+                break;
+            case 'fireworks':
+                console.log('you have started a forest fire. forrest fires attract bears. bear spawn chance +200%');
+                fight();
+
+                break;
+            case 'dirty socks':
+                console.log('Enemy ' + ' is discusted. attk down by random small amount');
+                fight();
+                break;
+            case 'mirror':
+                console.log('you look beautiful');
+                fight();
+                break;
+
+        
+        }
+
+    });
+}
+
+// function itemSelector(){}
+
+
+// drawForest();
+// drawWolf();
 selectParty();
