@@ -103,7 +103,8 @@ function enemyConstruct(name, attack, defense) {
     this.attack=attack;
     this.defense=defense;
     this.hitTheTarget = function(){
-        let coinflip = (Math.floor(Math.random() * 2) );
+        // let coinflip = (Math.floor(Math.random() * 2) );
+        allTheRandomness.coinfliper();
         party[coinflip].defense -= attack;
         console.log('');
         return party[coinflip].defense;
@@ -111,11 +112,12 @@ function enemyConstruct(name, attack, defense) {
 }
 let enemyArr = [];
 let wolfExists = false;
+let endGame = false;
 
 function playGame() {
         printStatus();
    
-    if (r < 5000 && wolfExists === false) {
+    if (!endGame && wolfExists === false) {
         
         inquirer.prompt(
             {
@@ -173,11 +175,11 @@ function playGame() {
     }
 }
 
-// a recursive function for battles
+// a recursive function for battles that calls playGame() once the battle is over
 function fight() {
 
     gameOver();
-    if (r<5000 && enemyArr[0].defense > 0 && enemyArr[0].name !== undefined){
+    if (!endGame && enemyArr[0].defense > 0 && enemyArr[0].name !== undefined){
          firstFightQuestion();
     } 
     if(enemyArr[0].defense <= 0) {
@@ -227,6 +229,28 @@ function secondFightQuestion() {
         }
     });
 }
+let userOf;
+let hasItemUser=false;
+// Asks a question to determine who the inv item would be used on
+function pickItemUser(){
+    inquirer.prompt({
+        type: "list",
+        name: "itemUseOnWho",
+        message: 'Who will you use the item on ?',
+        choices: [enemyArr[0].name, party[0].name, party[1].name]
+      }).then(function(answers) {
+        
+          if(answers.itemUseOnWho === enemyArr[0].name){
+            userof = party[1].defense;
+          } else if (answers.itemUseOnWho === party[0].name){
+            userof = party[1].defense;
+          }else if (answers.itemUseOnWho === party[1].name){
+               userof = party[1].defense;
+          }
+          hasItemUser=true;
+        });
+       
+}
 
  // all the logic for a random wolf battle
 function checkForWolves(){
@@ -262,7 +286,7 @@ function checkI() {
 //check for a win state
 function escapedOrNot(){
     if (tile === 36){
-        r=5000;
+        endGame = true;
         console.log('Whew, you made it out in '+ r + ' turns !!!');
     }
 }
@@ -275,7 +299,7 @@ function gameOver(){
         console.log('          Love is Over');
         console.log('');
         console.log('----------------------------------');
-        r=5000;
+        endGame = true;
         return 0;
     }
 }
@@ -433,19 +457,25 @@ console.log('');
 
 
 let allTheRandomness = {
-    critChance: (Math.floor(Math.random() * 100) + 1)
+    critChance: (Math.floor(Math.random() * 100) + 1),
+    coinfliper: function(){
+        coinflip = (Math.floor(Math.random() * 2) )
+    }
 };
 
 
 
 //--------------------------------------------------------- Items and Uses Section -------------------------------------------------------------------
 function inventoryCheck() {
+    pickItemUser();
+    if (hasItemUser){
     inquirer.prompt({
         type: "rawlist",
         name: "inventory",
         message: "What would you like to use?",
         choices: ["Map", "Rusty Axe", "revolver", "band-aid", "dirty socks", "Magic Wand", "AED", "fireworks", "mirror"]
     }).then(function (player) {
+        
         switch (player.inventory) {
             case 'Map':
                 console.log('heres the map');
@@ -461,7 +491,10 @@ function inventoryCheck() {
                 break;
             case 'band-aid':
                 console.log('can heal a small amount of hp per');
+                invItemUser.bandAid();
+                hasItemUser=false;
                 fight();
+
 
                 break;
             case 'Magic Wand':
@@ -487,13 +520,18 @@ function inventoryCheck() {
                 fight();
                 break;
 
-        
         }
 
     });
 }
+}
 
-// function itemSelector(){}
+
+let invItemUser = {
+    bandAid: function (userOf) {
+        this.defense +=300
+    }
+}
 
 
 // drawForest();
