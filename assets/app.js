@@ -4,6 +4,10 @@ var prints_ = require('./prints.js')
 
 var map_ = require('./map.js');
 
+var movement_ = require('./movementFuncs.js');
+
+// var enemyConstructor_ = require('./enemyConstructor')
+
 const chalk = require('chalk');
 
 // function theEverythingLivesHere(){
@@ -138,7 +142,7 @@ endGame = false;
 
 function playGame() {
         prints_.printStatus();
-        // escapedOrNot();
+        escapedOrNot();
    
     if (!endGame && wolfExists === false) {
         
@@ -152,30 +156,30 @@ function playGame() {
                 switch (player.todo) {
                     case 'Go Right':
                         console.log('you went right');
-                        goRight();
-                        console.log(facing)
+                        movement_.goRight();
+                        // console.log(facing)
                         console.log(tile);
 
                         break;
                     case 'Go Left':
                         console.log('you went left');
-                        goLeft();
-                        console.log(facing)
+                        movement_.goLeft();
+                        // console.log(facing)
                         console.log(tile);
                        
                         break;
                     case 'Go Up':
                         console.log('you went up');
-                        goForward();
-                        console.log(facing)
+                        movement_.goForward();
+                        // console.log(facing)
                         console.log(tile);
 
                         
                         break;
                     case 'Go Down':
                         console.log('you went down');
-                        goBack();
-                        console.log(facing)
+                        movement_.goBack();
+                        // console.log(facing)
                         console.log(tile);
 
                         break;
@@ -329,65 +333,9 @@ function gameOver(){
 
 
 
-let facing = 'north';
+exports.facing = 'north'
 
-// function goForward will not have to change directions
-function goForward() {
-    if (facing === 'north') {
-        tile += 7;
-    } else if (facing === 'south') {
-        tile -= 7;
-    } else if (facing === 'west'){
-        tile -= 1;
-    } else if (facing === 'east'){
-        tile +=1
-    }
-}
 
-// function goBack will have to go the opposite direction
-function goBack() {
-    if (facing === 'north') {
-        tile -= 7;
-        facing = 'south';
-    } else if (facing === 'south') {
-        tile += 7;
-        facing = 'west';
-    }
-}
-
-// function goBack will have to go the opposite direction
-function goLeft() {
-    if (facing === 'north') {
-        tile -= 1;
-        facing = 'west';
-    } else if (facing === 'south') {
-        tile += 1;
-        facing = 'east';
-    } else if (facing === 'west'){
-        tile -= 7;
-        facing = 'south';
-    } else if (facing === 'east'){
-        tile +=7
-        facing = 'north';
-    }
-}
-
-// function goRight will have to change the compass direction
-function goRight() {
-    if (facing === 'north') {
-        tile += 1;
-        facing = 'east';
-    } else if (facing === 'south') {
-        tile -= 1;
-        facing = 'west';
-    } else if (facing === 'west'){
-        tile += 7;
-        facing = 'north';
-    } else if (facing === 'east'){
-        tile -=7
-        facing = 'south';
-    }
-}
 
 
 

@@ -54,7 +54,7 @@ function printStatus() {
     console.log('');
     console.log('');
     console.log('');
-    appy_.escapedOrNot();
+    // appy_.escapedOrNot();
 }
 
 // status to show enemy's and player's current status 
