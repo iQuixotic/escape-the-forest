@@ -8,33 +8,27 @@ var movement_ = require('./movementFuncs.js');
 
 // var enemyConstructor_ = require('./enemyConstructor')
 
+var characterCreator = require('./characterConstructor');
+
 const chalk = require('chalk');
 
-// function theEverythingLivesHere(){
+
  
-function characterCreator(name, type, attack, defense) {
-    this.name=name;
-    this.type=type;
-    this.attack=attack;
-    this.defense=defense;
-    this.hitTheTarget = function(){
-        exports.enemyArr[0].hp -= attack;
-        exports.enemyArr[0].defense -= attack;
-        console.log('');
-       return exports.enemyArr[0].defense;
-    }
+
+
+let arrHolder = {
+    enemyArr: [],
+    party: []
 }
 
 // r is for recursive counter
-exports.enemyArr = [];
-exports.party = [];
 
-let organicLifeForms= function() {
-    console.log('here i is');
-    // return enemyArr;
-    return exports.party;
-    playGame();
-};
+// let organicLifeForms= function() {
+//     console.log('here i is');
+//     // return enemyArr;
+//     return arrHolder.party;
+//     playGame();
+// };
 
 let tileNum =function() {
     return tile;
@@ -84,8 +78,8 @@ let selectParty = function () {
         var partyMem = new characterCreator(partyMember.name, partyMember.clasS, attack,
             hp);
 
-            exports.party.push(partyMem);
-            console.log(exports.party[0]);
+            arrHolder.party.push(partyMem);
+            console.log(arrHolder.party[0]);
             console.log(partyMember.name + " added to the party");
             // console.log(partyMember);
             // console.log(partyMem);
@@ -94,8 +88,8 @@ let selectParty = function () {
             if(r<2){
             selectParty();
             } else {
-                console.log('You have selected the ' + exports.party[0].type + ' named ' + exports.party[0].name + 
-                ' and the ' + exports.party[1].type + ' named ' + exports.party[1].name + ' to attempt a forest escape together. \n');
+                console.log('You have selected the ' + arrHolder.party[0].type + ' named ' + arrHolder.party[0].name + 
+                ' and the ' + arrHolder.party[1].type + ' named ' + arrHolder.party[1].name + ' to attempt a forest escape together. \n');
                 inquirer.prompt(                     
                     {
                       type: "confirm",
@@ -104,14 +98,15 @@ let selectParty = function () {
                     }).then(function(user) {
                     if(user.start){
                 console.log('Good Luck !!!');
-                prints_.printStatus();
+                console.log(arrHolder.party);
+                prints_.printStatus(arrHolder.party);
                 r=0;
                 // organicLifeForms();
                 playGame();
                 // console.log(party);
                     } else if(!user.start){
                         r=0;
-                        exports.party = [];
+                        arrHolder.party = [];
                        
                         selectparty();
                     }
@@ -131,9 +126,9 @@ function enemyConstruct(name, attack, defense) {
     this.hitTheTarget = function(){
         // let coinflip = (Math.floor(Math.random() * 2) );
         allTheRandomness.coinfliper();
-        exports.party[coinflip].defense -= attack;
+        arrHolder.party[coinflip].defense -= attack;
         console.log('');
-        return exports.party[coinflip].defense;
+        return arrHolder.party[coinflip].defense;
     }
 }
 
@@ -141,7 +136,7 @@ let wolfExists = false;
 endGame = false;
 
 function playGame() {
-        prints_.printStatus();
+        prints_.printStatus(arrHolder.party);
         escapedOrNot();
    
     if (!endGame && wolfExists === false) {
@@ -206,12 +201,12 @@ function playGame() {
 function fight() {
 
     gameOver();
-    if (!endGame && exports.enemyArr[0].defense > 0 && exports.enemyArr[0].name !== undefined){
+    if (!endGame && arrHolder.enemyArr[0].defense > 0 && arrHolder.enemyArr[0].name !== undefined){
          firstFightQuestion();
     } 
-    if(exports.enemyArr[0].defense <= 0) {
+    if(arrHolder.enemyArr[0].defense <= 0) {
         console.log('The enemy was defeated !!')
-        exports.enemyArr.pop();
+        arrHolder.enemyArr.pop();
         wolfExists = false;
         playGame();
     }
@@ -222,12 +217,12 @@ function firstFightQuestion(){
     inquirer.prompt({
         type: "list",
         name: "whatDo",
-        message: exports.enemyArr[0].name + ' is ready to attack. What will you do ?',
+        message: arrHolder.enemyArr[0].name + ' is ready to attack. What will you do ?',
         choices: ['Fight', 'Run']
       }).then(function(answers) {
         
           if(answers.whatDo !== 'Fight'){
-              exports.enemyArr.pop();
+              arrHolder.enemyArr.pop();
               wolfExists=false;
               playGame();
           } else{
@@ -245,11 +240,11 @@ function secondFightQuestion() {
         choices: ['Attack', 'Inventory']
     }).then(function (answers) {
         if (answers.whatDoNext === 'Attack') {
-            prints_.printFight();
+            prints_.printFight(arrHolder.party, arrHolder.enemyArr);
 
-            exports.party[0].hitTheTarget();
-            exports.party[1].hitTheTarget();
-            exports.enemyArr[0].hitTheTarget();
+            arrHolder.party[0].hitTheTarget(arrHolder.enemyArr);
+            arrHolder.party[1].hitTheTarget(arrHolder.enemyArr);
+            arrHolder.enemyArr[0].hitTheTarget();
             fight();
         } else if (answers.whatDoNext === 'Inventory') {
             inventoryCheck();
@@ -264,15 +259,15 @@ function pickItemUser(){
         type: "list",
         name: "itemUseOnWho",
         message: 'Who will you use the item on ?',
-        choices: [exports.enemyArr[0].name, exports.party[0].name, exports.party[1].name]
+        choices: [arrHolder.enemyArr[0].name, arrHolder.party[0].name, arrHolder.party[1].name]
       }).then(function(answers) {
         
-          if(answers.itemUseOnWho === exports.enemyArr[0].name){
-            userof = exports.party[1].defense;
-          } else if (answers.itemUseOnWho === exports.party[0].name){
-            userof = exports.party[1].defense;
-          }else if (answers.itemUseOnWho === exports.party[1].name){
-               userof = exports.party[1].defense;
+          if(answers.itemUseOnWho === arrHolder.enemyArr[0].name){
+            userof = arrHolder.party[1].defense;
+          } else if (answers.itemUseOnWho === arrHolder.party[0].name){
+            userof = arrHolder.party[1].defense;
+          }else if (answers.itemUseOnWho === arrHolder.party[1].name){
+               userof = arrHolder.party[1].defense;
           }
           hasItemUser=true;
         });
@@ -282,7 +277,7 @@ function pickItemUser(){
  // all the logic for a random wolf battle
 function checkForWolves(){
    
-    let wolfSpawnChance = (Math.floor(Math.random() * 10) + 1);
+    let wolfSpawnChance = (Math.floor(Math.random() * 100) + 1);
     console.log('');
     if(tile>1 && tile<35 && wolfSpawnChance>9){
         console.log('A wild wolf appeared !!' );
@@ -290,7 +285,7 @@ function checkForWolves(){
         wolfExists = true;
     } if (wolfExists){
         let wolf = new enemyConstruct('wolf', 20, 200);
-        exports.enemyArr.push(wolf);
+        arrHolder.enemyArr.push(wolf);
         fight();
     }
 }
@@ -320,7 +315,7 @@ function escapedOrNot(){
 
 // Checks to see if all party members health equals zero
 function gameOver(){
-    if(exports.party[0].defense <= 0 && exports.party[1].defense <= 0){
+    if(arrHolder.party[0].defense <= 0 && arrHolder.party[1].defense <= 0){
         console.log('----------------------------------');
         console.log('');
         console.log('          Love is Over');
@@ -429,9 +424,9 @@ let invItemUser = {
 // theEverythingLivesHere();
 
 // module.exports = { theEverythingLivesHere };
-module.exports = { tileNum, playGame, organicLifeForms, escapedOrNot  }
-// module.exports.party = party;
-// module.exports.enemyArr = enemyArr;
+module.exports = { tileNum, playGame,  escapedOrNot, arrHolder  }
+// module.arrHolder.party = party;
+// module.arrHolder.enemyArr = enemyArr;
 
 
 // map_.showTheMap();

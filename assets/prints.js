@@ -1,12 +1,7 @@
 
 var appy_ = require("./app.js");
 
-// let enemyArr = [];
-// let party = [];
 
-// function declareEm(){
-// return party;
-// }
 
 function drawWolf() {
     console.log("      /\\      _-'/ ");
@@ -42,31 +37,31 @@ function drawForest() {
 
 //-------------------------------------------- FUNCTIONS FOR PRINTING ATTRIBUTES -----------------------------------------------------------------
 //function for displaying current Attributes
-function printStatus() {
+function printStatus(partyInfo) {
     
     // console.log(arg);
   
     console.log('');
     console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
-    console.log('   -    ' +'HP: ' + appy_.party[0].defense + '    -    ' + 'Attk: ' + appy_.party[0].attack + '     -     ' + appy_.party[0].name);
-    console.log('   -    ' +'HP: ' + appy_.party[1].defense + '    -    ' + 'Attk: ' + appy_.party[1].attack + '     -     ' + appy_.party[1].name);
+    console.log('   -    ' +'HP: ' + partyInfo[0].defense + '    -    ' + 'Attk: ' + partyInfo[0].attack + '     -     ' + partyInfo[0].name);
+    console.log('   -    ' +'HP: ' + partyInfo[1].defense + '    -    ' + 'Attk: ' + partyInfo[1].attack + '     -     ' + partyInfo[1].name);
     console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
     console.log('');
     console.log('');
     console.log('');
-    // appy_.escapedOrNot();
+    // escapedOrNot();
 }
 
 // status to show enemy's and player's current status 
-function printFight() {
+function printFight(partyInfo, enemyInfo) {
 
-    // console.log(appy_.party);
+    // console.log(partyInfo);
         console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
-        console.log('   -    ' +'HP: ' + appy_.party[0].defense + '    -    ' + 'Attk: ' + appy_.party[0].attack + '     -     ' + appy_.party[0].name);
-        console.log('   -    ' +'HP: ' + appy_.party[1].defense + '    -    ' + 'Attk: ' + appy_.party[1].attack + '     -     ' + appy_.party[1].name);
+        console.log('   -    ' +'HP: ' + partyInfo[0].defense + '    -    ' + 'Attk: ' + partyInfo[0].attack + '     -     ' + partyInfo[0].name);
+        console.log('   -    ' +'HP: ' + partyInfo[1].defense + '    -    ' + 'Attk: ' + partyInfo[1].attack + '     -     ' + partyInfo[1].name);
         console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
         console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
-        console.log('   -    ' +'HP: ' + appy_.enemyArr[0].defense + '    -    ' + 'Attk: ' + appy_.enemyArr[0].attack + '     -     ' + appy_.enemyArr[0].name);
+        console.log('   -    ' +'HP: ' + enemyInfo[0].defense + '    -    ' + 'Attk: ' + enemyInfo[0].attack + '     -     ' + enemyInfo[0].name);
         console.log('- - - - - - - - - - - - - - - - - - - - - - - -');
 }
 
