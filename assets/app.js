@@ -6,9 +6,11 @@ var map_ = require('./map.js');
 
 var movement_ = require('./movementFuncs.js');
 
+var enemyCreator = require('./enemyConstructor.js');
+
 // var enemyConstructor_ = require('./enemyConstructor')
 
-var characterCreator = require('./characterConstructor');
+var characterCreator = require('./characterConstructor.js');
 
 const chalk = require('chalk');
 
@@ -117,20 +119,9 @@ let selectParty = function () {
 
 
 
-let critChance, coinflip;
+// let critChance, coinflip;
 
-function enemyConstruct(name, attack, defense) {
-    this.name=name;
-    this.attack=attack;
-    this.defense=defense;
-    this.hitTheTarget = function(){
-        // let coinflip = (Math.floor(Math.random() * 2) );
-        allTheRandomness.coinfliper();
-        arrHolder.party[coinflip].defense -= attack;
-        console.log('');
-        return arrHolder.party[coinflip].defense;
-    }
-}
+
 
 let wolfExists = false;
 endGame = false;
@@ -244,7 +235,8 @@ function secondFightQuestion() {
 
             arrHolder.party[0].hitTheTarget(arrHolder.enemyArr);
             arrHolder.party[1].hitTheTarget(arrHolder.enemyArr);
-            arrHolder.enemyArr[0].hitTheTarget();
+            allTheRandomness.coinfliper();
+            arrHolder.enemyArr[0].hitTheTarget(arrHolder.party, coinflip);
             fight();
         } else if (answers.whatDoNext === 'Inventory') {
             inventoryCheck();
@@ -284,7 +276,8 @@ function checkForWolves(){
         console.log('');
         wolfExists = true;
     } if (wolfExists){
-        let wolf = new enemyConstruct('wolf', 20, 200);
+        let wolf = new enemyCreator('wolf', 20, 200);
+        console.log(wolf);
         arrHolder.enemyArr.push(wolf);
         fight();
     }
@@ -346,6 +339,7 @@ let allTheRandomness = {
     critChance: (Math.floor(Math.random() * 100) + 1),
     coinfliper: function(){
         coinflip = (Math.floor(Math.random() * 2) )
+        return coinflip;
     }
 };
 
@@ -424,7 +418,7 @@ let invItemUser = {
 // theEverythingLivesHere();
 
 // module.exports = { theEverythingLivesHere };
-module.exports = { tileNum, playGame,  escapedOrNot, arrHolder  }
+module.exports = { tileNum, playGame,  escapedOrNot, arrHolder, checkForWolves, allTheRandomness }
 // module.arrHolder.party = party;
 // module.arrHolder.enemyArr = enemyArr;
 
