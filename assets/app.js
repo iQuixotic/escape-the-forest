@@ -12,6 +12,8 @@ var enemyCreator = require('./enemyConstructor.js');
 
 var characterCreator = require('./characterConstructor.js');
 
+var inventoryControl = require('./inventoryControl.js');
+
 const chalk = require('chalk');
 
 
@@ -22,15 +24,6 @@ let arrHolder = {
     enemyArr: [],
     party: []
 }
-
-// r is for recursive counter
-
-// let organicLifeForms= function() {
-//     console.log('here i is');
-//     // return enemyArr;
-//     return arrHolder.party;
-//     playGame();
-// };
 
 let tileNum =function() {
     return tile;
@@ -222,8 +215,13 @@ function firstFightQuestion(){
         });
 }
 
+// let userOf;
+let hasItemUser=false;
+
+
 // function for second fight question
 function secondFightQuestion() {
+   
     inquirer.prompt({
         type: "list",
         name: "whatDoNext",
@@ -239,32 +237,20 @@ function secondFightQuestion() {
             arrHolder.enemyArr[0].hitTheTarget(arrHolder.party, coinflip);
             fight();
         } else if (answers.whatDoNext === 'Inventory') {
-            inventoryCheck();
-        }
-    });
+            let itemUseAttempted = false;
+            let hasItemUser = false;
+            
+            inventoryControl.inventoryCheck(arrHolder.enemyArr, arrHolder.party, fight);
+            // inventoryControl.invItemUser.pick();
+            // let runFight = function() {
+            //     fight();
+            // }
+            // runFight();
+            // inventoryControl.pickItemUser(arrHolder.enemyArr, arrHolder.party);
+            } 
+    }); 
 }
-let userOf;
-let hasItemUser=false;
-// Asks a question to determine who the inv item would be used on
-function pickItemUser(){
-    inquirer.prompt({
-        type: "list",
-        name: "itemUseOnWho",
-        message: 'Who will you use the item on ?',
-        choices: [arrHolder.enemyArr[0].name, arrHolder.party[0].name, arrHolder.party[1].name]
-      }).then(function(answers) {
-        
-          if(answers.itemUseOnWho === arrHolder.enemyArr[0].name){
-            userof = arrHolder.party[1].defense;
-          } else if (answers.itemUseOnWho === arrHolder.party[0].name){
-            userof = arrHolder.party[1].defense;
-          }else if (answers.itemUseOnWho === arrHolder.party[1].name){
-               userof = arrHolder.party[1].defense;
-          }
-          hasItemUser=true;
-        });
-       
-}
+
 
  // all the logic for a random wolf battle
 function checkForWolves(){
@@ -345,73 +331,9 @@ let allTheRandomness = {
 
 
 
-//--------------------------------------------------------- Items and Uses Section -------------------------------------------------------------------
-function inventoryCheck() {
-    pickItemUser();
-    if (hasItemUser){
-    inquirer.prompt({
-        type: "rawlist",
-        name: "inventory",
-        message: "What would you like to use?",
-        choices: ["Map", "Rusty Axe", "revolver", "band-aid", "dirty socks", "Magic Wand", "AED", "fireworks", "mirror"]
-    }).then(function (player) {
-        
-        switch (player.inventory) {
-            case 'Map':
-                console.log('heres the map');
-                fight();
-                break;
-            case 'Rusty Axe':
-                console.log('you have the rusty axe');
-                fight();
-                break;
-            case 'revolver':
-                console.log('can be used once for each bullet possessed');
-                fight();
-                break;
-            case 'band-aid':
-                console.log('can heal a small amount of hp per');
-                invItemUser.bandAid();
-                hasItemUser=false;
-                fight();
 
 
-                break;
-            case 'Magic Wand':
-                console.log('doubles mana for 1 battle. 12 tile movement cool-down');
-                fight();
 
-                break;
-            case 'AED':
-                console.log('the enemy is shocked that you have this. 1/4 chance of paral.');
-                fight();
-                break;
-            case 'fireworks':
-                console.log('you have started a forest fire. forrest fires attract bears. bear spawn chance +200%');
-                fight();
-
-                break;
-            case 'dirty socks':
-                console.log('Enemy ' + ' is discusted. attk down by random small amount');
-                fight();
-                break;
-            case 'mirror':
-                console.log('you look beautiful');
-                fight();
-                break;
-
-        }
-
-    });
-}
-}
-
-
-let invItemUser = {
-    bandAid: function (userOf) {
-        this.defense +=300
-    }
-}
 
 // }
 

@@ -1,5 +1,6 @@
 let appz_ = require('./app.js');
 
+// constructor for creating heros
 let characterCreator = function(name, type, attack, defense) {
     this.name=name;
     this.type=type;

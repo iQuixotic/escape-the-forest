@@ -1,5 +1,7 @@
 let appu_ = require('./app.js');
 
+// this is the constructor for making new enemies. The hitTheTarget method takes in the array of party (party) and 
+// the random number 0-1 of who (coinflip)
 let enemyConstruct = function(name, attack, defense) {
     this.name=name;
     this.attack=attack;
