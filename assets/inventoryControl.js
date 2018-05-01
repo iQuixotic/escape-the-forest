@@ -7,7 +7,7 @@ let hasItemUser;
 let userOf;
 
 // Asks a question to determine who the inv item would be used on
-function pickItemUser(enemyArr, party, method, funcUse){
+function pickItemUser(enemyArr, party, method, funcUse, arrHolder, wolfExists){
     // if(itemSelected) {
     inquirer.prompt({
         type: "list",
@@ -18,16 +18,16 @@ function pickItemUser(enemyArr, party, method, funcUse){
           if(answers.itemUseOnWho === enemyArr[0].name){
               console.log('si')
             userOf = enemyArr[0];
-            funcUse(userOf, method);
+            funcUse(userOf, method, arrHolder, wolfExists);
          
             console.log(userOf);
           } else if (answers.itemUseOnWho === party[0].name){
             userOf = party[0];
-            funcUse(userOf, method);
+            funcUse(userOf, method, arrHolder, wolfExists);
          
           }else if (answers.itemUseOnWho === party[1].name){
             userOf = party[1];
-            funcUse(userOf, method);
+            funcUse(userOf, method, arrHolder, wolfExists);
           }
             hasItemUser=true;
           
@@ -42,7 +42,7 @@ function pickItemUser(enemyArr, party, method, funcUse){
 // }
 
 // inventoryCheck will run a prompt and then runs a switch statement to use selected item
-function inventoryCheck(enemyArr, party, method) {
+function inventoryCheck(enemyArr, party, method, arrHolder, wolfExists) {
     // if (hasItemUser) {
         
         inquirer.prompt({
@@ -63,6 +63,7 @@ function inventoryCheck(enemyArr, party, method) {
 
                 case 'Rusty Axe':
                     console.log('you have the rusty axe');
+                    
                     itemSelected = true;
                     pickItemUser(enemyArr, party, method)
                     break;
@@ -71,14 +72,14 @@ function inventoryCheck(enemyArr, party, method) {
                 case 'revolver':
                     console.log('can be used once for each bullet possessed');
                     itemSelected = true;
-                    pickItemUser(enemyArr, party, method);
+                    pickItemUser(enemyArr, party, method, revolver, arrHolder, wolfExists);
                     break;
 
 
                 case 'band-aid':
                     console.log('can heal a small amount of hp per');
                     itemSelected = true;
-                    pickItemUser(enemyArr, party, method, bandAid);
+                    pickItemUser(enemyArr, party, method, bandAid, arrHolder, wolfExists);
                   
                     // bandAid(pickItemUser, userOf, method);
                    
@@ -126,10 +127,16 @@ function inventoryCheck(enemyArr, party, method) {
 
 }
 
-    function bandAid(arg, method) {
+    function bandAid(arg, method, arrHolder, wolfExists) {
         console.log('band aid has been used');
         arg.defense +=300;
-        method();
+        method(arrHolder, wolfExists);
+    }
+
+    function revolver(arg, method, arrHolder, wolfExists){
+        console.log('you shot the revolver !!');
+        arg.defense -=150;
+        method(arrHolder, wolfExists);
     }
     // bandAid(userOf, method);
 

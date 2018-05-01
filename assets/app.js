@@ -16,10 +16,12 @@ var inventoryControl = require('./inventoryControl.js');
 
 const chalk = require('chalk');
 
+const random = require('./random.js');
 
- 
+const status = require('./status.js');
 
 
+// global object to hold party members and enemies 
 let arrHolder = {
     enemyArr: [],
     party: []
@@ -27,7 +29,7 @@ let arrHolder = {
 
 let tileNum =function() {
     return tile;
-    playGame();
+    playGame(wolfExists);
 };
 
 let r=0;
@@ -97,7 +99,7 @@ let selectParty = function () {
                 prints_.printStatus(arrHolder.party);
                 r=0;
                 // organicLifeForms();
-                playGame();
+                playGame(wolfExists);
                 // console.log(party);
                     } else if(!user.start){
                         r=0;
@@ -119,9 +121,9 @@ let selectParty = function () {
 let wolfExists = false;
 endGame = false;
 
-function playGame() {
+function playGame(wolfExists) {
         prints_.printStatus(arrHolder.party);
-        escapedOrNot();
+        status.escapedOrNot(tile);
    
     if (!endGame && wolfExists === false) {
         
@@ -164,40 +166,37 @@ function playGame() {
                         break;
                     case 'Check Inventory':
                         console.log('');
-                        checkI();
+                        status.checkI(wolfExists, playGame, map_.showTheMap);
                         break;
                     default:
                         def();
                 }
                 console.log('this is tile#' + tile);
-                checkForWolves();
-
-                if( player.todo !=='Check Inventory' && wolfExists === false){
-                r++;
-                console.log('Score: ' + r + '        (Lower is better)');
-                playGame();
+                if( player.todo !=='Check Inventory'){
+                status.checkForWolves(arrHolder, enemyCreator, wolfExists, tile, xran, fight, random.allTheRandomness, r, playGame);
                 }
+               
             });
     }
 }
 
 // a recursive function for battles that calls playGame() once the battle is over
-function fight() {
-
-    gameOver();
+function fight(arrHolder, wolfExists) {
+    
+    status.gameOver(arrHolder);
     if (!endGame && arrHolder.enemyArr[0].defense > 0 && arrHolder.enemyArr[0].name !== undefined){
-         firstFightQuestion();
+         firstFightQuestion(arrHolder);
     } 
     if(arrHolder.enemyArr[0].defense <= 0) {
         console.log('The enemy was defeated !!')
         arrHolder.enemyArr.pop();
         wolfExists = false;
-        playGame();
+        playGame(wolfExists);
     }
 }
 
 // function for first fight question
-function firstFightQuestion(){
+function firstFightQuestion(arrHolder){
     inquirer.prompt({
         type: "list",
         name: "whatDo",
@@ -208,7 +207,7 @@ function firstFightQuestion(){
           if(answers.whatDo !== 'Fight'){
               arrHolder.enemyArr.pop();
               wolfExists=false;
-              playGame();
+              playGame(wolfExists);
           } else{
               secondFightQuestion();
           }
@@ -233,14 +232,15 @@ function secondFightQuestion() {
 
             arrHolder.party[0].hitTheTarget(arrHolder.enemyArr);
             arrHolder.party[1].hitTheTarget(arrHolder.enemyArr);
-            allTheRandomness.coinfliper();
+            random.allTheRandomness.coinfliper();
+            console.log(coinflip);
             arrHolder.enemyArr[0].hitTheTarget(arrHolder.party, coinflip);
-            fight();
+            fight(arrHolder, wolfExists);
         } else if (answers.whatDoNext === 'Inventory') {
             let itemUseAttempted = false;
             let hasItemUser = false;
             
-            inventoryControl.inventoryCheck(arrHolder.enemyArr, arrHolder.party, fight);
+            inventoryControl.inventoryCheck(arrHolder.enemyArr, arrHolder.party, fight, arrHolder, wolfExists);
             // inventoryControl.invItemUser.pick();
             // let runFight = function() {
             //     fight();
@@ -250,60 +250,9 @@ function secondFightQuestion() {
             } 
     }); 
 }
+let xran = 0;
 
 
- // all the logic for a random wolf battle
-function checkForWolves(){
-   
-    let wolfSpawnChance = (Math.floor(Math.random() * 100) + 1);
-    console.log('');
-    if(tile>1 && tile<35 && wolfSpawnChance>9){
-        console.log('A wild wolf appeared !!' );
-        console.log('');
-        wolfExists = true;
-    } if (wolfExists){
-        let wolf = new enemyCreator('wolf', 20, 200);
-        console.log(wolf);
-        arrHolder.enemyArr.push(wolf);
-        fight();
-    }
-}
-
-// function for checking inventory and using an item
-function checkI() {
-    inquirer.prompt({
-        type: "rawlist",
-        name: "inventory",
-        message: "What would you like to use?",
-        choices: ["Map", "Rusty Axe", "Revolver", "salt", "dirty socks", "Magic Wand"]
-    }).then(function (player) {
-        if (player.inventory === "Map") {
-            map_.showTheMap();
-            playGame();
-        }
-    });
-}
-
-//check for a win state
-function escapedOrNot(){
-    if (tile === 36){
-        endGame = true;
-        console.log('Whew, you made it out in '+ r + ' turns !!!');
-    }
-}
-
-// Checks to see if all party members health equals zero
-function gameOver(){
-    if(arrHolder.party[0].defense <= 0 && arrHolder.party[1].defense <= 0){
-        console.log('----------------------------------');
-        console.log('');
-        console.log('          Love is Over');
-        console.log('');
-        console.log('----------------------------------');
-        endGame = true;
-        return 0;
-    }
-}
 
 
 
@@ -321,26 +270,12 @@ exports.facing = 'north'
 
 
 
-let allTheRandomness = {
-    critChance: (Math.floor(Math.random() * 100) + 1),
-    coinfliper: function(){
-        coinflip = (Math.floor(Math.random() * 2) )
-        return coinflip;
-    }
-};
 
-
-
-
-
-
-
-// }
 
 // theEverythingLivesHere();
 
 // module.exports = { theEverythingLivesHere };
-module.exports = { tileNum, playGame,  escapedOrNot, arrHolder, checkForWolves, allTheRandomness }
+module.exports = { tileNum, playGame }
 // module.arrHolder.party = party;
 // module.arrHolder.enemyArr = enemyArr;
 

@@ -20,6 +20,12 @@ function goBack() {
         appx_.facing = 'south';
     } else if (appx_.facing === 'south') {
         tile += 7;
+        appx_.facing = 'north';
+    } else if (appx_.facing === 'west'){
+        tile +=1;
+        appx_.facing = 'east';
+    } else if (appx_.facing === 'east'){
+        tile -=1
         appx_.facing = 'west';
     }
 }
