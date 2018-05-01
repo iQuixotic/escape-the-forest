@@ -29,7 +29,7 @@ function showTheMap() {
     console.log('');
     console.log('You are current location is tile number  ' + tile);
     console.log('');
-    // app_.playGame();
+    // playGame();
 }
 
 
